@@ -1,0 +1,29 @@
+<nav class="navbar fixed-top navbar-expand-md navbar-dark">
+    <a class="navbar-brand" routerLink="">WeeWaze</a>
+    <!-- replace href with routerLink to stop browser from reloading the page; use the same link in the router module-->
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse" id="navbarMain">
+        <ul class="navbar-nav mr-auto">
+            <li routerLinkActive="active" class="nav-item">
+                <a class="nav-link" routerLink="about">About</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container content">
+    <router-outlet></router-outlet> <!-- angular injects extensible components here -->
+
+    &nbsp;
+    &nbsp;
+    <footer>
+        <div class="row">
+            <div class="col-12">
+                <small> Contact Me At: yezixbei@gmail.com </small>
+            </div>
+        </div>
+    </footer>
+</div>
