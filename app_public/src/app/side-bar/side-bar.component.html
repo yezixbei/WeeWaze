@@ -1,0 +1,35 @@
+<div class="row">
+    <div class="col-12">
+        <h3>
+            <small>
+                {{directions}}
+                <font color=#aaa> {{strapline}} </font>
+            </small>
+        </h3>
+    </div>
+</div>
+
+&nbsp;
+
+<form (submit)="onSubmit()">
+
+    <div class="form-group row">
+        <div class="col-lg-6 mb-3">
+            <label for="day">Day</label>
+            <input type="text" class="form-control" [(ngModel)]="query.day" name="day" id="day" placeholder="Monday">
+        </div>
+        <div class="col-lg-3 mb-3">
+                <label for="min">Start</label>
+                <input type="text" class="form-control" [(ngModel)]="query.min" name="min" id="min" placeholder="7">
+        </div>
+        <div class="col-lg-3 mb-3">
+            <label for="max">End</label>
+            <input type="text" class="form-control" [(ngModel)]="query.max" name="max" id="max" placeholder="9">
+        </div>
+    </div>
+
+    <div role="alert" *ngIf="formError" class="alert alert-danger"> {{ formError }}</div>
+    <button type="submit" role="button" class="btn btn-primary">Submit!</button>
+</form>
+
+

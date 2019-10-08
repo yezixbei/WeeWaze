@@ -12,10 +12,21 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
-    "dotenv": "^8.1.0",
+    "dotenv": "^8.0.0",
     "express": "~4.16.1",
+    "express-jwt": "^5.3.1",
     "http-errors": "~1.6.3",
-    "jade": "~1.11.0",
-    "morgan": "~1.9.1"
+    "mongoose": "^5.3.11",
+    "morgan": "~1.9.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "pg": "^7.12.1",
+    "pg-hstore": "^2.3.3",
+    "pug": "^2.0.4",
+    "request": "^2.88.0",
+    "sequelize": "^5.19.2",
+    "sequelize-typescript": "^1.0.0",
+    "serve-favicon": "~2.5.0",
+    "stripe": "^7.4.0"
   }
 }

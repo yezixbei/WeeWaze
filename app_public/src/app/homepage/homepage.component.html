@@ -1,2 +1,15 @@
-<app-page-header [content]="pageContent.header"></app-page-header> <!-- inject content to a nested component-->
-<p>HELLLO</p>
+<div class="container-fluid"> 
+    <div class="row">
+        <div class="col-12">
+            <app-page-header [content]="pageContent.header"></app-page-header> <!-- inject "content" to a child component-->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8" >
+            <app-scatter-plot [data]="mapData"></app-scatter-plot>
+        </div>
+        <div class="col-12 col-lg-4">
+            <app-side-bar (querySubmit)="getMapData()"> </app-side-bar>
+        </div>
+    </div>
+</div>

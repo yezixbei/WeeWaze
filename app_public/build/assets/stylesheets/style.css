@@ -9,8 +9,8 @@ legend {
 }
 
 .navbar {
-  background-color: #78C2AD;
-  border-color: #78C2AD;
+  background-color: darkseagreen;
+  border-color: darkseagreen;
 }
 
 .navbar-dark .navbar-brand {
@@ -49,7 +49,7 @@ legend {
 }
 
 .review-header {
-  background-color: #ffe2eb;
+  background-color: mintcream;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   margin-bottom: 0.5em;
@@ -62,11 +62,15 @@ legend {
 }
 
 .badge-default, .btn-primary {
-  background-color: #78C2AD;
-  border-color: #78C2AD;
+  background-color: darkseagreen;
+  border-color: darkseagreen;
 }
 
 h4 a, h4 a:hover {
+  color: #5a5a5a;
+}
+
+h3 {
   color: #5a5a5a;
 }
 
@@ -103,5 +107,5 @@ a:hover {
 body {
   font-family: "Cabin", Arial, sans-serif;
   color: #5a5a5a;
-  background-color: #ffe2eb;
+  background-color: mintcream;
 }

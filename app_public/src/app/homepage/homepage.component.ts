@@ -1,22 +1,41 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild, AfterViewInit} from '@angular/core';
+import { WeewazeDataService } from '../weewaze-data.service';
+import { SideBarComponent } from '../side-bar/side-bar.component';
+import { Points } from '../points';
 
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.component.html',
-  styleUrls: ['./homepage.component.css']
+  styleUrls: ['./homepage.component.css'],
 })
-export class HomepageComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+export class HomepageComponent {
   public pageContent = {
     header: {
       title: 'WeeWaze',
-      strapline: 'Get City-Wide Traffic Estimates!'
+      strapline: 'Get City-Wide Traffic Patterns for San Francisco!'
     }
   };
+
+  public mapData: Points[];
+
+  @ViewChild(SideBarComponent, { static: false })
+  sidebar: SideBarComponent;
+
+
+  constructor(private weewazeDataService: WeewazeDataService){ }
+
+  ngAfterViewInit(){
+    this.getMapData();
+  }
+
+  public getMapData():void {
+    this.weewazeDataService.talkToBackEnd(this.sidebar.query.day, this.sidebar.query.min, this.sidebar.query.max, this.sidebar.query.dir, 0)
+      .then(data => { 
+        this.mapData = data; 
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
 
 }

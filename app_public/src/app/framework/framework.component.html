@@ -1,6 +1,6 @@
 <nav class="navbar fixed-top navbar-expand-md navbar-dark">
     <a class="navbar-brand" routerLink="">WeeWaze</a>
-    <!-- replace href with routerLink to stop browser from reloading the page; use the same link in the router module-->
+    <!-- replace href with routerLink to stop browser from reloading the page; see app-router for the link options-->
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain">
         <span class="navbar-toggler-icon"></span>
@@ -15,7 +15,7 @@
 </nav>
 
 <div class="container content">
-    <router-outlet></router-outlet> <!-- angular injects extensible components here -->
+    <router-outlet></router-outlet> <!-- this is where angular injects its own components -->
 
     &nbsp;
     &nbsp;
@@ -27,3 +27,4 @@
         </div>
     </footer>
 </div>
+
