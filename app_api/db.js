@@ -1,8 +1,9 @@
 const Sequelize = require('sequelize');
-const config = require('./config')
+//const config = require('./config')
+require('dotenv').config();
 
 
-const sequelize = new Sequelize(`postgres://${config.user}:${config.password}@${config.host}:5432/${config.database}`);
+const sequelize = new Sequelize(`postgres://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:5432/${process.env.DATABASE}`);
 
 sequelize
   .authenticate()
