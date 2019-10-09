@@ -7,10 +7,10 @@ const sequelize = new Sequelize(`postgres://${config.user}:${config.password}@${
 sequelize
   .authenticate()
   .then(() => {
-    console.log('Connection has been established successfully.');
+    console.log('Connected to your database.');
   })
   .catch(err => {
-    console.error('Unable to connect to the database:', err);
+    console.error('Unable to connect to your database:', err);
   });
 
 
