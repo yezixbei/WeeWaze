@@ -46,7 +46,7 @@ export class WeewazeDataService{
     return true;
   }
 
-  private callHTTP(day: string, min: string, max: string, dir: string, tb: string): Promise<Points[]> {
+  private callHTTP(day: any, min: any, max: any, dir: any, tb: any): Promise<Points[]> {
     const url: string = `${this.apiBaseUrl}/points?day=${day}&min=${min}&max=${max}&dir=${dir}&tb=${tb}`;
     return this.http.get<Points[]>(url)
       .toPromise()
@@ -60,6 +60,6 @@ export class WeewazeDataService{
 
   public talkToBackEnd(day: string, min: string, max: string, reverse: number, tb: number): Promise<Points[]>{
     if (this.checkQuery(day, min, max, reverse, tb)) 
-      return this.callHTTP(this.parseDayOfWeek(day).toString(), min, max, reverse.toString(), tb.toString());
+      return this.callHTTP(this.parseDayOfWeek(day), min, max, reverse, tb);
   }
 }
