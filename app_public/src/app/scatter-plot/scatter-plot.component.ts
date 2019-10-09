@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, OnChanges, ViewChild, ViewEncapsulation, Input } from '@angular/core';
 import * as d3 from 'd3';
-import { Points } from '../points';
+import { Point } from '../point';
 
 
 @Component({
@@ -9,15 +9,17 @@ import { Points } from '../points';
   templateUrl: './scatter-plot.component.html',
   styleUrls: ['./scatter-plot.component.css']
 })
+
+/*
+Contains the logic for making a scatter plot with D3.
+*/
 export class ScatterPlotComponent implements OnChanges {
+  private MAX_X: number = 925;
+  private MAX_Y: number = 625;
+
+  @Input()data: Point[];
   @ViewChild('plot', { static: false })
   private plotContainer: ElementRef;
-
-  @Input()data: Points[];
-
-  FILEPATH: string = '../assets/data/twogb.csv';
-  MAX_X:number = 925;
-  MAX_Y:number = 625;
 
   constructor() { }
 
@@ -69,12 +71,10 @@ export class ScatterPlotComponent implements OnChanges {
     svg.append("g")
       .call(d3.axisLeft(y));
 
-
     // Add Color
-    var color = d3.scaleOrdinal<string, string>() // added <str, str>
+    var color = d3.scaleOrdinal<string, string>()
       .domain(["1", "2", "3", "4", "5"])
       .range(["#F8766D", "#F9DC5C", "#00BA38", "#619CFF", "#619CFF"])
-
 
     // Add Tooltip
     var tooltip = d3.select(element)
@@ -121,6 +121,7 @@ export class ScatterPlotComponent implements OnChanges {
       .style("fill", function (d) { return color(d["bucket"]) });
 
 
+    // Add animations
     // Add new X axis
     x.domain([0, this.MAX_X])
     svg.select(".orignial_x_axis")

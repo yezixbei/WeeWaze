@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { WeewazeDataService } from '../weewaze-data.service';
 
 @Component({
@@ -6,23 +6,27 @@ import { WeewazeDataService } from '../weewaze-data.service';
   templateUrl: './side-bar.component.html',
   styleUrls: ['./side-bar.component.css']
 })
-export class SideBarComponent implements OnInit {
-  public directions = "Enter a different day and time range to see a new map. "
+
+/*
+The sidebar receives and checks user input and alerts the homepage that it is ready.
+*/
+export class SideBarComponent{
+  public directions = "Enter a different hour range and day of the week to see a new map. "
   public strapline = "Each dot represent 100 square meters in the city. Hover over it to see the average speed at that location.";
   
   public formError: string = '';
-  public query = {
-    day: 'Monday',
-    min: '7',
-    max: '9', 
+  private d: Date = new Date();
+  public query = { // initialize with the current day and time
+    day: this.d.getDay().toString(),
+    min: this.d.getHours().toString(),
+    max: (this.d.getHours() + 4).toString(), 
     dir: '0'
   };
 
   @Output() querySubmit = new EventEmitter<string>();
 
-  constructor(public weewazeDataService: WeewazeDataService) { }
-
-  ngOnInit() {
+  
+  constructor(public weewazeDataService: WeewazeDataService) { 
   }
 
   public onSubmit(): void {
@@ -32,7 +36,7 @@ export class SideBarComponent implements OnInit {
     } else if (this.weewazeDataService.checkQuery(this.query.day, this.query.min, this.query.max, this.query.dir)){
       this.querySubmit.emit('');
     } else {
-      this.formError = 'Oops, there is something wrong with your inputs!';
+      this.formError = 'Please enter a day from 1 to 7 and an hour range from 0 to 23.';
     }
   }
 }

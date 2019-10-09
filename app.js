@@ -5,6 +5,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+
+// import your api 
 require('./app_api/db');  
 const apiRouter = require('./app_api/index');
 
@@ -15,7 +17,8 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-// express middleware
+
+// add middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -33,13 +36,14 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-// send requests 
+
+// send user requests to the right functions
 app.use('/api', apiRouter);
 app.get('*', function (req, res, next) {
   res.sendFile(path.join(__dirname, 'app_public', 'build', 'index.html'));
 });
 
-
+// handle error
 app.use(function (req, res, next) {
   next(createError(404));
 });

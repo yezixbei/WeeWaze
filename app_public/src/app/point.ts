@@ -1,6 +1,6 @@
-export class Points {
-    "x":number;
-    "y":number;
+export class Point {
+    "x": number;
+    "y": number;
     "longitude": number;
     "latitude": number;
     "speed": number;

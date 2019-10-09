@@ -11,20 +11,20 @@
 
 &nbsp;
 
-<form (submit)="onSubmit()">
+<form (submit)="onSubmit()" *ngIf="query">
 
     <div class="form-group row">
         <div class="col-lg-6 mb-3">
             <label for="day">Day</label>
-            <input type="text" class="form-control" [(ngModel)]="query.day" name="day" id="day" placeholder="Monday">
+            <input type="text" class="form-control" [(ngModel)]="query.day" name="day" id="day" placeholder="{{query.day}}">
         </div>
         <div class="col-lg-3 mb-3">
                 <label for="min">Start</label>
-                <input type="text" class="form-control" [(ngModel)]="query.min" name="min" id="min" placeholder="7">
+                <input type="text" class="form-control" [(ngModel)]="query.min" name="min" id="min" placeholder={{query.min}}>
         </div>
         <div class="col-lg-3 mb-3">
             <label for="max">End</label>
-            <input type="text" class="form-control" [(ngModel)]="query.max" name="max" id="max" placeholder="9">
+            <input type="text" class="form-control" [(ngModel)]="query.max" name="max" id="max" placeholder={{query.max}}>
         </div>
     </div>
 

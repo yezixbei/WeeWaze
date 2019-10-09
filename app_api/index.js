@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const PointsCtrl = require('./points');
+const PointsCtrl = require('./point');
 
 router
   .route('/points')

@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require('./db');
 
-const Points = db.sequelize.define('point', {
+const Point = db.sequelize.define('point', {
     x: {
         type: Sequelize.FLOAT,
         allowNull: false
@@ -88,6 +88,6 @@ const executeQuery = (req, res) => {
 };
 
 module.exports = {
-    Points,
+    Point,
     executeQuery
 };
