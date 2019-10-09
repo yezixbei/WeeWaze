@@ -29,7 +29,7 @@ export class HomepageComponent {
   }
 
   public getMapData():void {
-    this.weewazeDataService.talkToBackEnd(this.sidebar.query.day, this.sidebar.query.min, this.sidebar.query.max, this.sidebar.query.dir, 0)
+    this.weewazeDataService.callHTTP(this.sidebar.query.day, this.sidebar.query.min, this.sidebar.query.max, this.sidebar.query.dir)
       .then(data => { 
         this.mapData = data; 
       })

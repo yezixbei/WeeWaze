@@ -41,13 +41,11 @@ const executeQuery = (req, res) => {
             .json({ "message": "all query parameters are required" });
     }
 
-    const que = 
+    const que =
         `
-
         drop view v1 cascade;
-
         create view v1 as
-        select * from ${ input_table }
+        select * from ${ input_table}
         where(direction = ${ dir}) and(dayofweek = ${day}) and(hour between ${min} and ${max});
         
         create view v2 as 
@@ -64,11 +62,9 @@ const executeQuery = (req, res) => {
         else 5
         end) as bucket
         from v2; 
-
         create view v4 as 
         select *, 6028.0*longitude+738496.3 as x, 6371.0*latitude-240244 as y
         from v3;
-
         select round(cast(x as numeric), 3) as x, round(cast(y as numeric), 3) as y, bucket, longitude, latitude, round(cast(speed as numeric), 3) as speed
         from v4;
         
@@ -91,7 +87,7 @@ const executeQuery = (req, res) => {
 
 };
 
-module.exports = { 
-    Points, 
+module.exports = {
+    Points,
     executeQuery
 };

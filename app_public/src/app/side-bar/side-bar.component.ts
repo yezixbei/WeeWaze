@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { WeewazeDataService } from '../weewaze-data.service';
 
 @Component({
   selector: 'app-side-bar',
@@ -6,7 +7,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./side-bar.component.css']
 })
 export class SideBarComponent implements OnInit {
-  public directions = "Enter a different day and time range to see a new map. Reverse the direction of the traffic."
+  public directions = "Enter a different day and time range to see a new map. "
   public strapline = "Each dot represent 100 square meters in the city. Hover over it to see the average speed at that location.";
   
   public formError: string = '';
@@ -14,12 +15,12 @@ export class SideBarComponent implements OnInit {
     day: 'Monday',
     min: '7',
     max: '9', 
-    dir: 0
+    dir: '0'
   };
 
   @Output() querySubmit = new EventEmitter<string>();
 
-  constructor() { }
+  constructor(public weewazeDataService: WeewazeDataService) { }
 
   ngOnInit() {
   }
@@ -28,8 +29,10 @@ export class SideBarComponent implements OnInit {
     this.formError = '';
     if (!this.query.day || !this.query.min || !this.query.max) {
       this.formError = 'All fields are required, please try again';
-    } else {
+    } else if (this.weewazeDataService.checkQuery(this.query.day, this.query.min, this.query.max, this.query.dir)){
       this.querySubmit.emit('');
+    } else {
+      this.formError = 'Oops, there is something wrong with your inputs!';
     }
   }
 }

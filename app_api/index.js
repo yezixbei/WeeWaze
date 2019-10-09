@@ -5,6 +5,6 @@ const PointsCtrl = require('./points');
 
 router
   .route('/points')
-  .get(PointsCtrl.executeQuery) 
+  .get(PointsCtrl.executeQuery)
 
 module.exports = router;
