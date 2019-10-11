@@ -19,7 +19,7 @@ export class SideBarComponent{
   public query = { // initialize with the current day and time
     day: this.d.getDay().toString(),
     min: this.d.getHours().toString(),
-    max: (this.d.getHours() + 4).toString(), 
+    max: ((this.d.getHours() + 4)%24).toString(), 
     dir: '0'
   };
 

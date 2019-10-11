@@ -1,6 +1,9 @@
 const Sequelize = require('sequelize');
 const db = require('./db');
 
+/*
+This model represents a point that will be displayed in the UI. Each point is located in San Francisco and is 100 square meters in size. 
+*/
 const Point = db.sequelize.define('point', {
     x: {
         type: Sequelize.FLOAT,
@@ -28,6 +31,9 @@ const Point = db.sequelize.define('point', {
     }
 });
 
+/*
+This pipeline generates the output that the user sees.  
+*/
 const executeQuery = (req, res) => {
     const day = parseInt(req.query.day);
     const min = parseInt(req.query.min);
@@ -45,7 +51,7 @@ const executeQuery = (req, res) => {
         `
         drop view v1 cascade;
         create view v1 as
-        select * from ${ input_table}
+        select * from ${input_table}
         where(direction = ${ dir}) and(dayofweek = ${day}) and(hour between ${min} and ${max});
         
         create view v2 as 
@@ -67,8 +73,6 @@ const executeQuery = (req, res) => {
         from v3;
         select round(cast(x as numeric), 3) as x, round(cast(y as numeric), 3) as y, bucket, longitude, latitude, round(cast(speed as numeric), 3) as speed
         from v4;
-        
-        
         `
 
     try {
