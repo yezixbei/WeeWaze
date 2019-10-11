@@ -6,7 +6,7 @@ The economic cost of congestion exceeds $500 billion a year and is projected to 
 
 The purpose of WeeWaze is to translate approximately 87GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco given a time range. The deliverables are a scalable pipeline that supports ad hoc queries, a friendly and responsive single page application that interacts with the user, and a REST API interfaces with the entire dataset post transformation. See a demo of the SPA here:  http://bit.ly/WeeWaze.
 
-![Screen Shot 2019-10-10 at 4.40.04 PM](/Users/yezi/Desktop/Screen Shot 2019-10-10 at 4.40.04 PM.png)
+![weewaze_front_page](https://raw.githubusercontent.com/yezixbei/WeeWaze/tree/master/app_public/src/assets/pics/weewaze_front_page.png)
 
 
 
@@ -20,7 +20,7 @@ The batch data consists of 87GB of GPS logs spread over approximately 1200 CSV f
 
 My design decisions were based on the fact that the final pipeline should be scalable, fault tolerant, extensible, and supports fast, ad hoc queries. I chose S3 for batch storage because it allows bulk reads and writes. I chose Spark for batch processing because of its high throughput and scalability.[?] In order to support fast ad hoc queries, I picked PostgreSQL because it allows indexing and fast random reads.  Although  we did not need fast random writes for the serving layer, the batch view is small enough (2 million rows) that we can sacrifice scalability for extensibilty; the kinds of data transformation we can do with a SQL database is much greater than a NoSQL database like Cassandra. I built the RESTful API with Express.js and Sequelize and the single page application with D3 and Angular. Angular was chosen for the front end for its reusable components because of the short time constraints of the project. 
 
-![Screen Shot 2019-10-10 at 3.33.53 PM](/Users/yezi/Desktop/Screen Shot 2019-10-10 at 3.33.53 PM.png)
+![tools_design](https://raw.githubusercontent.com/yezixbei/WeeWaze/tree/master/app_public/src/assets/pics/tools_design.png)
 
 
 
@@ -32,7 +32,7 @@ We want the end product to be a speed map over San Francisco for an arbitary tim
 
 
 
-![Screen Shot 2019-10-10 at 3.31.49 PM](/Users/yezi/Desktop/Screen Shot 2019-10-10 at 3.31.49 PM.png)
+![pipe_diagrams](https://raw.githubusercontent.com/yezixbei/WeeWaze/tree/master/app_public/src/assets/pics/pipe_diagrams.png)
 
 
 

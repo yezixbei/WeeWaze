@@ -40,7 +40,7 @@ const executeQuery = (req, res) => {
     const max = parseInt(req.query.max);
     const dir = parseInt(req.query.dir);
     const tb = parseInt(req.query.tb);
-    const input_table = tb == 0 ? 'twogb' : 'onehgb';
+    const input_table = tb == 0 ? 'part_table' : 'full_table';
     if ((!day && day !== 0) || (!min && min !== 0) || (!max && max !== 0) || (!dir && dir !== 0) || (!tb && tb !== 0)) {
         return res
             .status(404)
