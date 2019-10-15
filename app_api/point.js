@@ -2,7 +2,8 @@ const Sequelize = require('sequelize');
 const db = require('./db');
 
 /*
-This model represents a point that will be displayed in the UI. Each point is located in San Francisco and is 100 square meters in size. 
+Model represents a point that will be displayed in the UI. 
+Each point is located in San Francisco and is 100 square meters in size. 
 */
 const Point = db.sequelize.define('point', {
     x: {
@@ -31,28 +32,18 @@ const Point = db.sequelize.define('point', {
     }
 });
 
-/*
-This pipeline generates the output that the user sees.  
-*/
-const executeQuery = (req, res) => {
-    const day = parseInt(req.query.day);
-    const min = parseInt(req.query.min);
-    const max = parseInt(req.query.max);
-    const dir = parseInt(req.query.dir);
-    const tb = parseInt(req.query.tb);
-    const input_table = tb == 0 ? 'part_table' : 'full_table';
-    if ((!day && day !== 0) || (!min && min !== 0) || (!max && max !== 0) || (!dir && dir !== 0) || (!tb && tb !== 0)) {
-        return res
-            .status(404)
-            .json({ "message": "all query parameters are required" });
-    }
+// Below are methods that are called via the public facing API to help generate scatter plots for data visualization.
 
-    const que =
+// helper functions
+const executeQuery = (res, filterString) => {
+    // These raw SQL commands creates the visualization shown in the web UI, and also any custom visualization
+    // They filters the dataset, performs a group by on each square to find the average speed, creates three new columns 
+    // for visualization: a speed bucket for the display color, x-projection, and y-projection. 
+    const qry =
         `
         drop view v1 cascade;
         create view v1 as
-        select * from ${input_table}
-        where(direction = ${ dir}) and(dayofweek = ${day}) and(hour between ${min} and ${max});
+        ${filterString}
         
         create view v2 as 
         select longitude, latitude, sum(speed_sum)/sum(speed_count) as speed from v1
@@ -68,19 +59,21 @@ const executeQuery = (req, res) => {
         else 5
         end) as bucket
         from v2; 
+
         create view v4 as 
         select *, 6028.0*longitude+738496.3 as x, 6371.0*latitude-240244 as y
         from v3;
+
         select round(cast(x as numeric), 3) as x, round(cast(y as numeric), 3) as y, bucket, longitude, latitude, round(cast(speed as numeric), 3) as speed
         from v4;
         `
 
     try {
-        db.sequelize.query(que)
-            .then(points => {
+        db.sequelize.query(qry)
+            .then(data => {
                 res
                     .status(200)
-                    .json(points);
+                    .json(data);
             })
 
     } catch (err) {
@@ -88,10 +81,144 @@ const executeQuery = (req, res) => {
             .status(404)
             .json(err);
     };
-
 };
+
+// The default map is a map of San Francisco given a day of the week and an hour range in the day
+const defaultMap = (req, res, table_name) => {
+    const dir = '0';
+    const input_table = table_name;
+    const day = parseInt(req.query.day);
+    const hourmin = parseInt(req.query.hourmin);
+    const hourmax = parseInt(req.query.hourmax);
+    if ((!day && day !== 0) || (day < 0 || 6 < day) ||
+        (hourmin > hourmax) || (hourmin < 0 || 23 < hourmin) || (hourmax < 0 || 23 < hourmax)) {
+        return res
+            .status(404)
+            .json({ "message": "Please enter the day and the hours within the day as day, hourmin, and hourmax. Please enter all three parameters." });
+    }
+
+    var filterString =
+        `
+        select * from ${input_table}
+        where(direction = ${dir}) and dayofweek=${day} and (hour between ${hourmin} and ${hourmax});
+        `
+    executeQuery(res, filterString);
+}
+
+
+// Creates the scatter plot shown in the web interface
+const partMap = (req, res) => {
+    defaultMap(req, res, 'part_table');
+}
+
+// Create the same default scatter plot but using the entire dataset
+const fullMap = (req, res) => {
+    defaultMap(req, res, 'full_table');
+}
+
+// Rest of the functions create scatter plots from the entire dataset 
+// given a range in longitude and latitude, day, hour, or all four parameters
+const mapByArea = (req, res) => {
+    const dir = '0';
+    const input_table = 'full_table';
+    const lonmin = parseFloat(req.query.lonmin);
+    const lonmax = parseFloat(req.query.lonmax);
+    const latmin = parseFloat(req.query.latmin);
+    const latmax = parseFloat(req.query.latmin);
+    if ((!lonmin && lonmin !== float) || (!lonmax && lonmax !== float) || (!latmin && latmin !== float) || (!latmax && latmax !== float) ||
+        (lonmin < -122.513 || -122.358 < lonmin) || (latmin < 37.709 || 37.807 < latmax)) {
+        return res
+            .status(404)
+            .json({ "message": "Please enter a longitude and latitude range within San Francisco using lonmin, lonmax, latmin, and latmax." });
+    }
+
+    var filterString = 
+        `
+        select * from ${input_table}
+        where(direction = ${dir}) and (longitude between ${lonmin} and ${lonmax}) and (latitude between ${latmin} and ${latmax});
+        `
+    executeQuery(res, filterString);
+}
+
+// change the range of days
+const mapByDay = (req, res) => {
+    const dir = '0';
+    const input_table = 'full_table';
+    const min = parseInt(req.query.min);
+    const max = parseInt(req.query.max);
+    if ((!min && min !== 0) || (!max && max !== 0) || (min > max) || (min < 0 || 6 < min) || (max < 0 || 6 < max)) {
+        return res
+            .status(404)
+            .json({ "message": "Please enter a day range between 0 and 6. Please use min and max" });
+    }
+
+    var filterString =
+        `
+        select * from ${input_table}
+        where(direction = ${dir}) and (dayofweek between ${min} and ${max});
+        `
+    executeQuery(res, filterString);
+}
+
+// change the range of hours
+const mapByHour = (req, res) => {
+    const dir = '0';
+    const input_table = 'full_table';
+    const min = parseInt(req.query.min);
+    const max = parseInt(req.query.max);
+    if ((!min && min !== 0) || (!max && max !== 0) || (min > max) || (min < 0 || 23 < min) || (max < 0 || 23 < max)) {
+        return res
+            .status(404)
+            .json({ "message": "Please enter an hour range between 0 and 23. Please use min and max" });
+    }
+
+    var filterString =
+        `
+        select * from ${input_table}
+        where(direction = ${dir}) and (hour between ${min} and ${max});
+        `
+    executeQuery(res, filterString);
+}
+
+// change the range of all three parameters
+const mapByAll = (req, res) => {
+    const dir = '0';
+    const input_table = 'full_table';
+    const lonmin = parseFloat(req.query.lonmin);
+    const lonmax = parseFloat(req.query.lonmax);
+    const latmin = parseFloat(req.query.latmin);
+    const latmax = parseFloat(req.query.latmin);
+    const daymin = parseInt(req.query.daymin);
+    const daymax = parseInt(req.query.daymax);
+    const hourmin = parseInt(req.query.hourmin);
+    const hourmax = parseInt(req.query.hourmax);
+
+    if ((!lonmin && lonmin !== float) || (!lonmax && lonmax !== float) || (!latmin && latmin !== float) || (!latmax && latmax !== float) ||
+        (lonmin < -122.513 || -122.358 < lonmin) || (latmin < 37.709 || 37.807 < latmax) ||
+        (!daymin && daymin !== 0) || (!daymax && daymax !== 0) || (daymin > daymax) || (daymin < 0 || 6 < daymin) || (daymax < 0 || 6 < daymax) ||
+        (!hourmin && hourmin !== 0) || (!hourmax && hourmax !== 0) || (hourmin > hourmax) || (hourmin < 0 || 23 < hourmin) || (hourmax < 0 || 23 < hourmax)) {
+        return res
+            .status(404)
+            .json({ "message": "Please double check your query parameters" });
+    }
+
+    var filterString =
+        `
+        select * from ${input_table}
+        where(direction = ${dir}) and 
+            (longitude between ${lonmin} and ${lonmax}) and (latitude between ${latmin} and ${latmax}) and 
+            (dayofweek between ${daymin} and ${daymax}) and
+            (hour between ${hourmin} and ${hourmax});
+        `
+    executeQuery(res, filterString);
+}
 
 module.exports = {
     Point,
-    executeQuery
+    partMap,
+    fullMap,
+    mapByArea,
+    mapByDay,
+    mapByHour,
+    mapByAll
 };

@@ -17,22 +17,20 @@ export class WeewazeDataService{
   private handleError(error: any): Promise<any> { return Promise.reject(error.message || error); }
 
   // Checks all inputs are numbers and the day is between 1 to 7 and the hours are from 0 to 23.
-  public checkQuery(day: string, min: string, max: string, dir: string): boolean {
+  public checkQuery(day: string, min: string, max: string): boolean {
     var p_day = parseInt(day)+1; // sunday is stored as "1" in the database
     var p_min = Math.floor(parseInt(min));
     var p_max = Math.floor(parseInt(max));
-    var p_dir = parseInt(dir);
 
-    if (isNaN(p_day) || isNaN(p_min) || isNaN(p_max) || isNaN(p_dir)) {return false;}
+    if (isNaN(p_day) || isNaN(p_min) || isNaN(p_max)) {return false;}
 
-    if (p_day < 1 || 7 < p_day || p_min < 0 || 23 < p_max || p_min > p_max || 
-      !(p_dir == 0 || p_dir == 1)) {return false;}
+    if (p_day < 1 || 7 < p_day || p_min < 0 || 23 < p_max || p_min > p_max) {return false;}
 
     return true;
   }
 
-  public callHTTP(day: string, min: string, max: string, dir: string): Promise<Point[]> {
-    const url: string = `${this.apiBaseUrl}/points?day=${parseInt(day) + 1}&min=${min}&max=${max}&dir=${dir}&tb=0`;
+  public callHTTP(day: string, hourmin: string, hourmax: string): Promise<Point[]> {
+    const url: string = `${this.apiBaseUrl}/partmap?day=${parseInt(day) + 1}&hourmin=${hourmin}&hourmax=${hourmax}`;
     return this.http.get<Point[]>(url)
       .toPromise()
       .then(

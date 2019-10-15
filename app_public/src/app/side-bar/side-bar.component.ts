@@ -20,7 +20,6 @@ export class SideBarComponent{
     day: this.d.getDay().toString(),
     min: this.d.getHours().toString(),
     max: ((this.d.getHours() + 4) > 23 ? 23 : (this.d.getHours() + 4)).toString(), 
-    dir: '0'
   };
 
   @Output() querySubmit = new EventEmitter<string>();
@@ -33,7 +32,7 @@ export class SideBarComponent{
     this.formError = '';
     if (!this.query.day || !this.query.min || !this.query.max) {
       this.formError = 'All fields are required, please try again';
-    } else if (this.weewazeDataService.checkQuery(this.query.day, this.query.min, this.query.max, this.query.dir)){
+    } else if (this.weewazeDataService.checkQuery(this.query.day, this.query.min, this.query.max)){
       this.querySubmit.emit('');
     } else {
       this.formError = 'Please enter a day from 1 to 7 and an hour range from 0 to 23.';

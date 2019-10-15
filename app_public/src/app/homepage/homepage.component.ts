@@ -35,7 +35,7 @@ export class HomepageComponent {
   }
 
   public getMapData():void {
-    this.weewazeDataService.callHTTP(this.sidebar.query.day, this.sidebar.query.min, this.sidebar.query.max, this.sidebar.query.dir)
+    this.weewazeDataService.callHTTP(this.sidebar.query.day, this.sidebar.query.min, this.sidebar.query.max)
       .then(data => { 
         this.mapData = data; 
       })
