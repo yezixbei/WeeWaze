@@ -4,7 +4,7 @@
 
 The economic cost of traffic congestion exceeds $500 billion a year and is projected to get worse over time as more people move into cities. Having access to fine-grained historical traffic patterns is useful for data analysts who wants to visualize the data and data scientists running traffic prediction algorithms. 
 
-WeeWaze is a project I built while I was a data engineering fellow at Insight Data Science. The purpose of WeeWaze is to translate approximately 87GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco given an arbitary time range.  I built a scalable pipeline that supports ad hoc queries, a single page application that interacts with the user, and a REST API that interfaces with the entire dataset post transformation.  Take a look at the API [here](app_api/README).  See a demo of the website here:  [http://bit.ly/WeeWaze](http://bit.ly/WeeWaze).
+WeeWaze is a project I built while I was a data engineering fellow at Insight Data Science. The purpose of WeeWaze is to translate approximately 87GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco given an arbitary time range.  I built a scalable pipeline that supports ad hoc queries, a single page application that interacts with the user, and a REST API that interfaces with the entire dataset post transformation.  Take a look at the API [here](https://github.com/yezixbei/WeeWaze/tree/master/app_api).  See a demo of the website here:  [http://bit.ly/WeeWaze](http://bit.ly/WeeWaze).
 
 ![weewaze_front_page](app_public/src/assets/pics/weewaze_front_page.png)
 
@@ -54,12 +54,14 @@ Install and configure [AWS CLI](https://aws.amazon.com/cli/) and [Pegasus](https
 
 Before creating a cluster, make a VPC with a single subnet with the AWS VPC Wizard and create a security group for this project.  Open all TCP communication between nodes in the same security group, and open ssh communication to your IP. Record your subnet-id and your security-group-id for Pegasus.
 
-<h5>Deploying Your AWS Instances and Installing Spark
+<h4>Deploying Your AWS Instances and Installing Spark
 </h5>
 
 Use Pegasus to quickly deploy your cluster.  First update your bash profile with your aws credentials.  Next update your yml files with your subnet-id and your security-group-id. The yml files are stored under /pegasus/examples/spark. One master and three slaves should be enough to run the batch job. Either type `run ./pegasus/examples/spark/spark_hadoop.sh"` in the appropriate folder or manually install hadoop and spark using Pegasus commands.
 
-##### Installing PostgreSQL
+<h4>Installing PostgreSQL
+  
+</h4>
 
 Install your PostgreSQL on your master node. To install, type `sudo apt install postgresql PostgreSQL-contrib`.  Login as superuser "postgres". Change your listen_address from "localhost" to "*" in postgresql.conf and change your permissions in pg_hba.conf.  Both files should be located in /etc/postgresql. Next start your postgresql service by typing `sudo service postgresql start`.
 
