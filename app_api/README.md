@@ -32,7 +32,7 @@ GET http://bit.ly.WeeWaze/api/fullMap/area
             "latitude": 37.765,
             "speed": "23.189"
         },
-   			...
+   		...
    ]
 ```
 
@@ -63,7 +63,7 @@ GET http://bit.ly.WeeWaze/api/fullMap/day
             "latitude": 37.765,
             "speed": "23.189"
         },
-   			...
+   		...
    ]
 ```
 
@@ -94,7 +94,7 @@ GET http://bit.ly.WeeWaze/api/fullMap/hour
             "latitude": 37.765,
             "speed": "23.189"
         },
-   			...
+        ...
    ]
 ```
 
@@ -131,7 +131,7 @@ GET http://bit.ly.WeeWaze/api/fullMap/all
             "latitude": 37.765,
             "speed": "23.189"
         },
-   			...
+   		...
    ]
 ```
 
@@ -163,7 +163,7 @@ GET http://bit.ly.WeeWaze/api/fullMap
             "latitude": 37.765,
             "speed": "23.189"
         },
-   			...
+   		...
    ]
 ```
 
@@ -195,7 +195,7 @@ GET http://bit.ly.WeeWaze/api/partMap
             "latitude": 37.765,
             "speed": "23.189"
         },
-   			...
+   		...
    ]
 ```
 

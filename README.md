@@ -4,7 +4,7 @@
 
 The economic cost of traffic congestion exceeds $500 billion a year and is projected to get worse over time as more people move into cities. Having access to fine-grained historical traffic patterns is useful for data analysts who wants to visualize the data and data scientists running traffic prediction algorithms. 
 
-WeeWaze is a project I built while I was a data engineering fellow at Insight Data Science. The purpose of WeeWaze is to translate approximately 87GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco given an arbitary time range.  I built a scalable pipeline that supports ad hoc queries, a single page application that interacts with the user, and a REST API that interfaces with the entire dataset post transformation.  Take a look at the API [here](https://github.com/yezixbei/WeeWaze/tree/master/app_api).  See a demo of the website here:  [http://bit.ly/WeeWaze](http://bit.ly/WeeWaze).
+WeeWaze is a project I built while I was a data engineering fellow at Insight Data Science. The purpose of WeeWaze is to translate approximately 87GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco given an arbitary time range.  I built a scalable pipeline that supports ad hoc queries, a single page application that interacts with the user, and a REST API that interfaces with the entire dataset post transformation.  Take a look at the API inside [root/app_public](https://github.com/yezixbei/WeeWaze/tree/master/app_api).  See a demo of the live website on heroku:  [http://bit.ly/WeeWaze](http://bit.ly/WeeWaze).
 
 ![weewaze_front_page](app_public/src/assets/pics/weewaze_front_page.png)
 
@@ -12,15 +12,15 @@ WeeWaze is a project I built while I was a data engineering fellow at Insight Da
 
 ## Dataset
 
-The batch data consists of 87GB of GPS logs spread over approximately 1200 CSV files.  It covers the routes of 330 buses in San Francisco over the span of four years from 2013 to 2016. It has the following schema: [REV, REPORT_TIME, VEHICLE_TAG, LONGITUDE, LATITUDE, SPEED, HEADING, TRAIN_ASSIGNMENT, PREDICTABLE], but the columns we are interested in are [REPORT_TIME, LONGITUDE, LATITUDE, SPEED, HEADING]. The size of the original dataset is about a billion rows.  See the dataset [here](https://data.sfgov.org/Transportation/Historical-raw-AVL-GPS-data/5fk7-ivit).
+The batch data consists of 87GB of GPS logs spread over approximately 1200 CSV files.  It covers the routes of 330 buses in San Francisco over the span of four years from 2013 to 2016. It has the following schema: [REV, REPORT_TIME, VEHICLE_TAG, LONGITUDE, LATITUDE, SPEED, HEADING, TRAIN_ASSIGNMENT, PREDICTABLE], but the columns we are interested in are [REPORT_TIME, LONGITUDE, LATITUDE, SPEED, HEADING]. The size of the original dataset is about a billion rows.  See the dataset at [data.sfgov.org](https://data.sfgov.org/Transportation/Historical-raw-AVL-GPS-data/5fk7-ivit).
 
 
 
 ## Tools & Design Decisions
 
-I used S3 for batch storage, Spark for batch processing, and PostgreSQL for serving layer storage.
+I used S3 for batch storage, Spark for batch processing, and PostgreSQL for "hot spot" storage. I used S3 because I needed something that can do massive reads and writes, and I chose it over HDFS because it was cheaper and can expand without hardware limits. I choose Spark over Hadoop for batch processing because I could work with higher level abstrations like dataframes rather than write every single command in map-reduce. If time to deployment was not an issue, and I had time to become a Hadoop expert, I would consider using Hadoop becauese it is computationally cheaper. I chose PostgreSQL for "hot spot" storage because it offered simple data models, multi-key access (as opposed to single-key access for a document database), and built-in aggregations.  If I had used a document database I would have had to duplicate my tables for each unit of time in order to get a time querable view.  The downside is Postgres is not write scalable; if I ever want to update this project to include real-time views and scale up the number of users, I would have to switch to a NoSQL database.
 
-I built the REST API with Express.js and Sequelize and the single page application with D3 and Angular. Angular was chosen for the front end for its reusable components because of the short time constraints of the project. 
+I built the REST API with Express, Sequelize, and Node.js and the single page application with D3 and Angular. Angular was chosen for the front end for its reusable components because of the short time constraints of the project, and D3 provides interactive data visualizations. 
 
 ![tools_design](app_public/src/assets/pics/tools_design.png)
 
