@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
         df = sqlContext.createDataFrame(rdd) 
 
-
+        
 
         """
         This is where we start computing the batch views by taking the data through a series of simple transformations:
