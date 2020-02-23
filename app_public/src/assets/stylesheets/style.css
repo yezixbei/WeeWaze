@@ -1,11 +1,12 @@
-@import url("//fonts.googleapis.com/css?family=Lobster|Cabin:400,700");
+@import url("//fonts.googleapis.com/css?family=Oleo+Script|Cabin:400,700");
+
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Lobster', cursive;
+  font-family: 'Oleo Script', cursive;
 }
 
 legend {
-  font-family: 'Lobster', cursive;
+  font-family: 'Oleo Script', cursive;
 }
 
 .navbar {
@@ -14,7 +15,7 @@ legend {
 }
 
 .navbar-dark .navbar-brand {
-  font-family: 'Lobster', cursive;
+  font-family: 'Oleo Script', cursive;
   color: #fff;
 }
 
@@ -71,6 +72,7 @@ h4 a, h4 a:hover {
 }
 
 h3 {
+  font-size: 200%;
   color: #5a5a5a;
 }
 
@@ -78,6 +80,10 @@ h4 small {
   font-size: 60%;
   line-height: 200%;
   color: #aaa;
+}
+
+h1 {
+  font-size: 300%;
 }
 
 h1 small {

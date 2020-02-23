@@ -8,16 +8,12 @@ import psycopg2
 import os
 
 """
-Scripts running the batch layer of the application. 
-The purpose here is to generate a batch view of reasonable size for ad hoc queries via the REST API 
-(code under "app_api") or the web interface (under "app_public").
+Scripts to generate batch views of reasonable size for ad hoc queries.
  """
 if __name__ == '__main__':
 
         """
-        You may adjust constants GRIDLEN however you want and MIN_SPEED from 6-12MPH. GRIDLEN is the 
-        size of the grid you want to overlay on top of San Francisco.
-        See below for more details.
+        Use GRIDLEN to set the grain of the mesh you want to overlay San Francisco. MIN_SPEED should be from 6-12MPH.
         """
         MIN_SPEED = 9.0 # MPH
         MAX_SPEED = 70.0
@@ -46,10 +42,6 @@ if __name__ == '__main__':
 
         
         """
-        Ingest the data from the batch layer, which is an S3 bucket, then transform the raw files into a 
-        dataframe so we can use Spark's built in API (for faster executions).
-        
-        The batch data consists of 87GB of occasionally malformed GPS log files from SFMTA with the following schema: 
         [REV,REPORT_TIME,VEHICLE_TAG,LONGITUDE,LATITUDE,SPEED,HEADING,TRAIN_ASSIGNMENT,PREDICTABLE]. 
         The columns we are interested in are [REPORT_TIME, LONGITUDE, LATITUDE, SPEED, HEADING], which are refered to as 
         [df_2, df_4, df_5, df_6, df_7] in the dataframe . 
@@ -66,7 +58,7 @@ if __name__ == '__main__':
         
 
         """
-        This is where we start computing the batch views by taking the data through a series of simple transformations:
+        Compute the batch views by taking the data through a series of simple transformations:
 
         First we filter the data to within the limits of San Francisco and within speeds where we can reasonably expect 
         the bus to be moving (as opposed to idling or picking up passengers). The upper and lower speed limits are 
@@ -75,7 +67,7 @@ if __name__ == '__main__':
 
         Next we format the columns and round the longitude and latitude values to the decimal place corresponding 
         to the size of the grid we want. The transformation here is that a bounding box of length n (in meters) is 
-        determined by the mth decimal place in its GPS coordinates. The values of n and m that we are going to demo 
+        determined by the mth decimal place in its GPS coordinates. The values of n and m that we are going to use 
         are 100 meters and the 3rd decimal place. We can adjust the size of the grid using the parameter GRIDLEN.
 
         After rounding, we do a groupby to determine the average speed within each bounding square. This is computationally
@@ -113,9 +105,9 @@ if __name__ == '__main__':
 
 
         """
-        Save the batch view into a SQL database for quick queries. 
+        Save the batch view into PostgresSQL
 
-        An example of a serving layer query can be to compute traffic maps based on a day of the week, an hour 
+        An example of a query can be to compute traffic maps based on a day of the week, an hour 
         range from 0 to 23, and a direction ie for each tuple of (dayofweek, min_hour, max_hour, direction), 
         the serving layer should compute the average speeds of San Francisco divided into grids of 100 square meters. 
 

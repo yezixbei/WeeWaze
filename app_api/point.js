@@ -90,11 +90,11 @@ const defaultMap = (req, res, table_name) => {
     const day = parseInt(req.query.day);
     const hourmin = parseInt(req.query.hourmin);
     const hourmax = parseInt(req.query.hourmax);
-    if ((!day && day !== 0) || (day < 0 || 6 < day) ||
-        (hourmin > hourmax) || (hourmin < 0 || 23 < hourmin) || (hourmax < 0 || 23 < hourmax)) {
+    if ((!day && day !== parseInt(day)) || (day < 1 || day > 7) ||
+        (hourmin > hourmax) || (hourmin < 0 || hourmin > 23) || (hourmax < 0 || hourmax > 23)) {
         return res
             .status(404)
-            .json({ "message": "Please enter the day and the hours within the day as day, hourmin, and hourmax. Please enter all three parameters." });
+            .json({ "message": "Please check your parameters." });
     }
 
     var filterString =
@@ -129,7 +129,7 @@ const mapByArea = (req, res) => {
         (lonmin < -122.513 || -122.358 < lonmin) || (latmin < 37.709 || 37.807 < latmax)) {
         return res
             .status(404)
-            .json({ "message": "Please enter a longitude and latitude range within San Francisco using lonmin, lonmax, latmin, and latmax." });
+            .json({ "message": "Please check your longitude and latitude parameters." });
     }
 
     var filterString = 
@@ -146,10 +146,10 @@ const mapByDay = (req, res) => {
     const input_table = 'full_table';
     const min = parseInt(req.query.min);
     const max = parseInt(req.query.max);
-    if ((!min && min !== 0) || (!max && max !== 0) || (min > max) || (min < 0 || 6 < min) || (max < 0 || 6 < max)) {
+    if ((!min && min !== 0) || (!max && max !== 0) || (min > max) || (min < 1 || 7 < min) || (max < 1 || 7 < max)) {
         return res
             .status(404)
-            .json({ "message": "Please enter a day range between 0 and 6. Please use min and max" });
+            .json({ "message": "Please check your day parameters" });
     }
 
     var filterString =
@@ -169,7 +169,7 @@ const mapByHour = (req, res) => {
     if ((!min && min !== 0) || (!max && max !== 0) || (min > max) || (min < 0 || 23 < min) || (max < 0 || 23 < max)) {
         return res
             .status(404)
-            .json({ "message": "Please enter an hour range between 0 and 23. Please use min and max" });
+            .json({ "message": "Please check your hour parameters"});
     }
 
     var filterString =
@@ -195,11 +195,11 @@ const mapByAll = (req, res) => {
 
     if ((!lonmin && lonmin !== float) || (!lonmax && lonmax !== float) || (!latmin && latmin !== float) || (!latmax && latmax !== float) ||
         (lonmin < -122.513 || -122.358 < lonmin) || (latmin < 37.709 || 37.807 < latmax) ||
-        (!daymin && daymin !== 0) || (!daymax && daymax !== 0) || (daymin > daymax) || (daymin < 0 || 6 < daymin) || (daymax < 0 || 6 < daymax) ||
+        (!daymin && daymin !== 0) || (!daymax && daymax !== 0) || (daymin > daymax) || (daymin < 1 || 7 < daymin) || (daymax < 1 || 7 < daymax) ||
         (!hourmin && hourmin !== 0) || (!hourmax && hourmax !== 0) || (hourmin > hourmax) || (hourmin < 0 || 23 < hourmin) || (hourmax < 0 || 23 < hourmax)) {
         return res
             .status(404)
-            .json({ "message": "Please double check your query parameters" });
+            .json({ "message": "Please check your query parameters" });
     }
 
     var filterString =

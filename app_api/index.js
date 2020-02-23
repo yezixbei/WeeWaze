@@ -1,36 +1,36 @@
 const express = require('express');
 const router = express.Router();
 
-const PointCtrl = require('./point');
+const Point = require('./point');
 
 router
     .route('/partmap') 
-    .get(PointCtrl.partMap); // don't put req res in paren here
+    .get(Point.partMap); // don't put req res in paren here
 
 router
     .route('/fullmap')
-    .get(PointCtrl.fullMap);
+    .get(Point.fullMap);
 
 router
     .route('/fullmap/area')
-    .get(PointCtrl.mapByArea);
+    .get(Point.mapByArea);
 
 router
     .route('/fullmap/day')
-    .get(PointCtrl.mapByDay);
+    .get(Point.mapByDay);
 
 router
     .route('/fullmap/hour')
-    .get(PointCtrl.mapByHour);
+    .get(Point.mapByHour);
 
 router
     .route('/fullmap/all')
-    .get(PointCtrl.mapByAll);
+    .get(Point.mapByAll);
 
 router
     .route('/ping')
     .get((req, res) => {
-        res.status(200).json("The server is healthy.");
+        res.status(200).json("The server is alive! Thanks for checking!");
     });
 
 module.exports = router;
