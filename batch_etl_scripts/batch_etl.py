@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
         # Format the columns
         df = (df
-                .withColumn("dayofweek", dayofweek(time))
+                .withColumn("dayofweek", dayofweek(time)) # 1 is sunday, 7 is saturday
                 .withColumn("hour", hour(time))
                 .withColumn("direction", floor(dirr/180.0))
                 .withColumn("latitude", round(lat, NUM_DEC_PLACES))

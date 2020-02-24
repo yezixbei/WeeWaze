@@ -17,7 +17,7 @@ export class SideBarComponent{
   
   public formError: string = '';
   private curr: Date = new Date();
-  public query = { // initialize with the current day and time
+  public query = { // initialize with current day and time
     day: this.curr.getDay().toString(),
     min: this.curr.getHours().toString(),
     max: ((this.curr.getHours() + 4) > 23 ? '23' : (this.curr.getHours() + 4)).toString(), // default interval is 4 hrs
@@ -37,7 +37,7 @@ export class SideBarComponent{
       if (this.weewazeDataService.checkQuery(this.query.day, this.query.min, this.query.max)) {
         this.querySubmit.emit('');
       } else {
-        this.formError = 'Days must be an integer from 1 to 7 and hours must be integers from 0 to 23. Please try again!';
+        this.formError = 'Days must be intergers from 0 to 6 and hours must be integers from 0 to 23. Please try again!';
       }
     } 
   }

@@ -13,12 +13,10 @@ GET http://bit.ly.WeeWaze/api/fullMap/area
 
 ### Parameters
 
-| Name   | Type  | Description                                                  |
-| ------ | ----- | ------------------------------------------------------------ |
-| latmin | float | The smallest latitude in your area range; please pick a number between -122.513 and -122.358. |
-| latmax | float | The largest latitude in your area range; please pick a number between -122.513 and -122.358. |
-| lonmin | float | The smallest longitude in your area range; please pick a number between 37.709 and 37.807. |
-| lonmax | float | The largest longitude in your area range; please pick a number between 37.709 and 37.807. |
+| Name           | Type  | Description                                                 |
+| -------------- | ----- | ----------------------------------------------------------- |
+| latmin, latmax | float | Please pick a decimal number between -122.513 and -122.358. |
+| lonmin, lonmax | float | Please pick a decimal number between 37.709 and 37.807.     |
 
 <h3>Response
 
@@ -46,10 +44,9 @@ GET http://bit.ly.WeeWaze/api/fullMap/day
 
 ### Parameters
 
-| Name | Type   | Description                                                  |
-| ---- | ------ | ------------------------------------------------------------ |
-| min  | string | The smallest day in your date range; please pick a day of the week or a number between 0 and 6. |
-| max  | string | The biggest day in your date range; please pick a day of the week or a number between 0 and 6. |
+| Name     | Type   | Description                                                |
+| -------- | ------ | ---------------------------------------------------------- |
+| min, max | string | Please pick an integer between 0 and 6, where 0 is Sunday. |
 
 <h3>Response
 
@@ -77,10 +74,9 @@ GET http://bit.ly.WeeWaze/api/fullMap/hour
 
 ### Parameters
 
-| Name | Type   | Description                                                  |
-| ---- | ------ | ------------------------------------------------------------ |
-| min  | string | The smallest hour in your hour range; please pick a number between 0 and 23. |
-| max  | string | The smallest hour in your hour range; please pick a number between 0 and 23. |
+| Name     | Type   | Description                                                  |
+| -------- | ------ | ------------------------------------------------------------ |
+| min, max | string | Take the floor to the nearest hour; for example, the correct time for 23:59 should be 23.  Min, max should be integers between 0 and 23 |
 
 <h3>Response
 
@@ -108,16 +104,12 @@ GET http://bit.ly.WeeWaze/api/fullMap/all
 
 ### Parameters
 
-| Name    | Type   | Description                                                  |
-| ------- | ------ | ------------------------------------------------------------ |
-| latmin  | float  | The smallest latitude in your area range; please pick a number between -122.513 and -122.358. |
-| latmax  | float  | The largest latitude in your area range; please pick a number between -122.513 and -122.358. |
-| lonmin  | float  | The smallest longitude in your area range; please pick a number between 37.709 and 37.807. |
-| lonmax  | float  | The largest longitude in your area range; please pick a number between 37.709 and 37.807. |
-| daymin  | string | The smallest day in your date range; please pick a day of the week and a number between 0 and 6. |
-| daymax  | string | The biggest day in your date range; please pick a day of the week and a number between 0 and 6. |
-| hourmin | string | The smallest hour in your hour range; please pick a number between 0 and 23. |
-| hourmax | string | The largest hour in your hour range; please pick a number between 0 and 23. |
+| Name             | Type   | Description                                                  |
+| ---------------- | ------ | ------------------------------------------------------------ |
+| latmin, latmax   | float  | Please pick a decimal number between -122.513 and -122.358.  |
+| lonmin, lonmax   | float  | Please pick a decimal number between 37.709 and 37.807.      |
+| daymin, daymax   | string | Please pick an integer between 0 and 6, where 0 is Sunday.   |
+| hourmin, hourmax | string | Take the floor to the nearest hour; for example, the correct time for 23:59 should be 23.  hourmin, hourmax should be integers between 0 and 23. |
 
 <h3>Response
 
@@ -145,11 +137,10 @@ GET http://bit.ly.WeeWaze/api/fullMap
 
 ### Parameters
 
-| Name    | Type   | Description                                                  |
-| ------- | ------ | ------------------------------------------------------------ |
-| day     | string | A day of the week; please pick a number between 0 and 6.     |
-| hourmin | string | The smallest hour in your hour range; please pick a number between 0 and 23. |
-| hourmax | string | The largest hour in your hour range; please pick a number between 0 and 23. |
+| Name             | Type   | Description                                                  |
+| ---------------- | ------ | ------------------------------------------------------------ |
+| day              | string | Please pick an integer between 0 and 6, where 0 is Sunday.   |
+| hourmin, hourmax | string | Take the floor to the nearest hour; for example, the correct time for 23:59 should be 23.  hourmin, hourmax should be integers between 0 and 23. |
 
 <h3>Response
 
@@ -177,11 +168,10 @@ GET http://bit.ly.WeeWaze/api/partMap
 
 ### Parameters
 
-| Name    | Type   | Description                                                  |
-| ------- | ------ | ------------------------------------------------------------ |
-| day     | string | A day of the week; please pick a number between 0 and 6.     |
-| hourmin | string | The smallest hour in your hour range; please pick a number between 0 and 23. |
-| hourmax | string | The largest hour in your hour range; please pick a number between 0 and 23. |
+| Name              | Type   | Description                                                  |
+| ----------------- | ------ | ------------------------------------------------------------ |
+| day               | string | Please pick an integer between 0 and 6, where 0 is Sunday.   |
+| hourmin , hourmax | string | Take the floor to the nearest hour; for example, the correct time for 23:59 should be 23.  hourmin, hourmax should be integers between 0 and 23. |
 
 <h3>Response
 
@@ -216,5 +206,5 @@ None
 <h3>Response
 
 ```
-"The server is healthy."
+"The server is alive! Thanks for checking!""
 ```

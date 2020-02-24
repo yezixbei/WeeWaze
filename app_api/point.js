@@ -90,17 +90,18 @@ const defaultMap = (req, res, table_name) => {
     const day = parseInt(req.query.day);
     const hourmin = parseInt(req.query.hourmin);
     const hourmax = parseInt(req.query.hourmax);
-    if ((!day && day !== parseInt(day)) || (day < 1 || day > 7) ||
+    if ((!day && day !== 0) || (day < 0 || day > 6) || // expect 0 for sunday, 6 for saturday
         (hourmin > hourmax) || (hourmin < 0 || hourmin > 23) || (hourmax < 0 || hourmax > 23)) {
         return res
             .status(404)
             .json({ "message": "Please check your parameters." });
     }
 
+    var adjustedDay = day+1; // database stores 1 for sunday, 7 for saturday 
     var filterString =
         `
         select * from ${input_table}
-        where(direction = ${dir}) and dayofweek=${day} and (hour between ${hourmin} and ${hourmax});
+        where(direction = ${dir}) and dayofweek=${adjustedDay} and (hour between ${hourmin} and ${hourmax});
         `
     executeQuery(res, filterString);
 }
@@ -117,7 +118,7 @@ const fullMap = (req, res) => {
 }
 
 // Rest of the functions create scatter plots from the entire dataset 
-// given a range in longitude and latitude, day, hour, or all four parameters
+// given a range of longitude and latitude, day, hour, or all four parameters
 const mapByArea = (req, res) => {
     const dir = '0';
     const input_table = 'full_table';
