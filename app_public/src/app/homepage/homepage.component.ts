@@ -1,4 +1,4 @@
-import { Component, ViewChild, AfterViewInit} from '@angular/core';
+import { Component, ViewChild} from '@angular/core';
 import { WeewazeDataService } from '../weewaze-data.service';
 import { SideBarComponent } from '../side-bar/side-bar.component';
 import { Point } from '../point';

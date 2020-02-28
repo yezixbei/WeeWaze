@@ -6,13 +6,8 @@ const sequelize = new Sequelize(`postgres://${process.env.USER}:${process.env.PA
 
 sequelize
   .authenticate()
-  .then(() => {
-    console.log('Connected to your database.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to your database:', err);
-  });
-
+  .then(() => { console.log('Connected to your database.');})
+  .catch(err => { console.error('Unable to connect to your database:', err);});
 
 module.exports = {
   Sequelize,

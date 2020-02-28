@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const db = require('./db');
 
 /*
-Model represents a point that will be displayed in the UI. 
+Model represents a map point.
 Each point is located in San Francisco and is 100 square meters in size. 
 */
 const Point = db.sequelize.define('point', {
@@ -32,18 +32,25 @@ const Point = db.sequelize.define('point', {
     }
 });
 
-// Below are methods that are called via the public facing API to help generate scatter plots for data visualization.
+/*
+Exposes a single get function for generating maps on WeeWaze.
+*/
 
-// helper functions
-const executeQuery = (res, filterString) => {
-    // These raw SQL commands creates the visualization shown in the web UI, and also any custom visualization
-    // They filters the dataset, performs a group by on each square to find the average speed, creates three new columns 
-    // for visualization: a speed bucket for the display color, x-projection, and y-projection. 
+// Helper Functions
+const error = (res, queryParams) => {
+    return res.status(404).json({
+        "message": `Please check query parameters ${queryParams}.`
+    });
+}
+
+const executeQuery = (res, filter) => {
+    // Performs a group by on each square to find the average speed, creates three new columns for visualization: 
+    // a speed bucket for the display color, x-projection, and y-projection. 
     const qry =
         `
         drop view v1 cascade;
         create view v1 as
-        ${filterString}
+        ${filter}
         
         create view v2 as 
         select longitude, latitude, sum(speed_sum)/sum(speed_count) as speed from v1
@@ -83,143 +90,92 @@ const executeQuery = (res, filterString) => {
     };
 };
 
-// The default map is a map of San Francisco given a day of the week and an hour range in the day
-const defaultMap = (req, res, table_name) => {
+
+// Main Function
+const getMap = (req, res) => {
     const dir = '0';
-    const input_table = table_name;
-    const day = parseInt(req.query.day);
-    const hourmin = parseInt(req.query.hourmin);
-    const hourmax = parseInt(req.query.hourmax);
-    if ((!day && day !== 0) || (day < 0 || day > 6) || // expect 0 for sunday, 6 for saturday
-        (hourmin > hourmax) || (hourmin < 0 || hourmin > 23) || (hourmax < 0 || hourmax > 23)) {
-        return res
-            .status(404)
-            .json({ "message": "Please check your parameters." });
+    const table = req.query.display ? 'part_table' : 'full_table';
+    var filter =
+        `
+        select * from ${table}
+        where(direction = ${dir})`
+
+    if (typeof req.query.day != "undefined"){
+        const day = parseInt(req.query.day);
+
+        if (typeof req.query.daymin != "undefined" || 
+            typeof req.query.daymax != "undefined" || 
+            isNaN(day) || 
+            day < 0 || 6 < day) {
+            return error(res, 'day');
+        }
+        filter += ` and (dayofweek = ${day + 1})`; // 1 for Sunday in database
     }
 
-    var adjustedDay = day+1; // database stores 1 for sunday, 7 for saturday 
-    var filterString =
-        `
-        select * from ${input_table}
-        where(direction = ${dir}) and dayofweek=${adjustedDay} and (hour between ${hourmin} and ${hourmax});
-        `
-    executeQuery(res, filterString);
-}
+    if (typeof req.query.daymin != "undefined" || typeof req.query.daymax != "undefined") {
+        const daymin = parseInt(req.query.daymin);
+        const daymax = parseInt(req.query.daymax);
 
+        if (typeof req.query.daymin == "undefined" || 
+            typeof req.query.daymax == "undefined" ||
+            isNaN(daymin) || 
+            isNaN(daymax) || 
+            daymin > daymax || 
+            daymin < 0 || 6 < daymin || 
+            daymax < 0 || 6 < daymax) {
+            return error(res, 'daymin and daymax');
+        }
 
-// Creates the scatter plot shown in the web interface
-const partMap = (req, res) => {
-    defaultMap(req, res, 'part_table');
-}
-
-// Create the same default scatter plot but using the entire dataset
-const fullMap = (req, res) => {
-    defaultMap(req, res, 'full_table');
-}
-
-// Rest of the functions create scatter plots from the entire dataset 
-// given a range of longitude and latitude, day, hour, or all four parameters
-const mapByArea = (req, res) => {
-    const dir = '0';
-    const input_table = 'full_table';
-    const lonmin = parseFloat(req.query.lonmin);
-    const lonmax = parseFloat(req.query.lonmax);
-    const latmin = parseFloat(req.query.latmin);
-    const latmax = parseFloat(req.query.latmin);
-    if ((!lonmin && lonmin !== float) || (!lonmax && lonmax !== float) || (!latmin && latmin !== float) || (!latmax && latmax !== float) ||
-        (lonmin < -122.513 || -122.358 < lonmin) || (latmin < 37.709 || 37.807 < latmax)) {
-        return res
-            .status(404)
-            .json({ "message": "Please check your longitude and latitude parameters." });
+        filter += ` and (dayofweek between ${daymin+1} and ${daymax+1})`;
     }
 
-    var filterString = 
-        `
-        select * from ${input_table}
-        where(direction = ${dir}) and (longitude between ${lonmin} and ${lonmax}) and (latitude between ${latmin} and ${latmax});
-        `
-    executeQuery(res, filterString);
-}
+    if (typeof req.query.hourmin != "undefined" || typeof req.query.hourmax != "undefined") {
+        const hourmin = parseInt(req.query.hourmin);
+        const hourmax = parseInt(req.query.hourmax);
 
-// change the range of days
-const mapByDay = (req, res) => {
-    const dir = '0';
-    const input_table = 'full_table';
-    const min = parseInt(req.query.min);
-    const max = parseInt(req.query.max);
-    if ((!min && min !== 0) || (!max && max !== 0) || (min > max) || (min < 1 || 7 < min) || (max < 1 || 7 < max)) {
-        return res
-            .status(404)
-            .json({ "message": "Please check your day parameters" });
+        if (typeof req.query.hourmin == "undefined" || 
+            typeof req.query.hourmin == "undefined" ||
+            isNaN(hourmin) || 
+            isNaN(hourmax) || 
+            hourmin > hourmax || 
+            hourmin < 0 || 23 < hourmin || 
+            hourmax < 0 || 23 < hourmax) {
+            return error(res, 'hourmin and hourmax');
+        }
+        filter += ` and (hour between ${hourmin} and ${hourmax})`;
     }
 
-    var filterString =
-        `
-        select * from ${input_table}
-        where(direction = ${dir}) and (dayofweek between ${min} and ${max});
-        `
-    executeQuery(res, filterString);
-}
+    if (typeof req.query.lonmin != "undefined" || typeof req.query.lonmax != "undefined" ||
+        typeof req.query.latmin != "undefined" || typeof req.query.latmax != "undefined") {
+        const lonmin = parseFloat(req.query.lonmin);
+        const lonmax = parseFloat(req.query.lonmax);
+        const latmin = parseFloat(req.query.latmin);
+        const latmax = parseFloat(req.query.latmax);
 
-// change the range of hours
-const mapByHour = (req, res) => {
-    const dir = '0';
-    const input_table = 'full_table';
-    const min = parseInt(req.query.min);
-    const max = parseInt(req.query.max);
-    if ((!min && min !== 0) || (!max && max !== 0) || (min > max) || (min < 0 || 23 < min) || (max < 0 || 23 < max)) {
-        return res
-            .status(404)
-            .json({ "message": "Please check your hour parameters"});
+        if (typeof req.query.lonmin == "undefined" || 
+            typeof req.query.lonmax == "undefined" ||
+            typeof req.query.latmin == "undefined" || 
+            typeof req.query.latmax == "undefined" ||
+            isNaN(lonmin) || 
+            isNaN(lonmax) || 
+            isNaN(latmin) || 
+            isNaN(latmax) ||
+            lonmax < lonmin || 
+            latmax < latmin ||
+            lonmin < -122.513 || -122.358 < lonmax || 
+            latmin < 37.709 || 37.807 < latmax) {
+            return error(res, 'lat and lon');
+        }
+
+        filter += ` and (longitude between ${lonmin} and ${lonmax}) and (latitude between ${latmin} and ${latmax})`;
     }
 
-    var filterString =
-        `
-        select * from ${input_table}
-        where(direction = ${dir}) and (hour between ${min} and ${max});
-        `
-    executeQuery(res, filterString);
-}
+    filter += `;`;
+    executeQuery(res, filter);
+ }
 
-// change the range of all three parameters
-const mapByAll = (req, res) => {
-    const dir = '0';
-    const input_table = 'full_table';
-    const lonmin = parseFloat(req.query.lonmin);
-    const lonmax = parseFloat(req.query.lonmax);
-    const latmin = parseFloat(req.query.latmin);
-    const latmax = parseFloat(req.query.latmin);
-    const daymin = parseInt(req.query.daymin);
-    const daymax = parseInt(req.query.daymax);
-    const hourmin = parseInt(req.query.hourmin);
-    const hourmax = parseInt(req.query.hourmax);
-
-    if ((!lonmin && lonmin !== float) || (!lonmax && lonmax !== float) || (!latmin && latmin !== float) || (!latmax && latmax !== float) ||
-        (lonmin < -122.513 || -122.358 < lonmin) || (latmin < 37.709 || 37.807 < latmax) ||
-        (!daymin && daymin !== 0) || (!daymax && daymax !== 0) || (daymin > daymax) || (daymin < 1 || 7 < daymin) || (daymax < 1 || 7 < daymax) ||
-        (!hourmin && hourmin !== 0) || (!hourmax && hourmax !== 0) || (hourmin > hourmax) || (hourmin < 0 || 23 < hourmin) || (hourmax < 0 || 23 < hourmax)) {
-        return res
-            .status(404)
-            .json({ "message": "Please check your query parameters" });
-    }
-
-    var filterString =
-        `
-        select * from ${input_table}
-        where(direction = ${dir}) and 
-            (longitude between ${lonmin} and ${lonmax}) and (latitude between ${latmin} and ${latmax}) and 
-            (dayofweek between ${daymin} and ${daymax}) and
-            (hour between ${hourmin} and ${hourmax});
-        `
-    executeQuery(res, filterString);
-}
 
 module.exports = {
     Point,
-    partMap,
-    fullMap,
-    mapByArea,
-    mapByDay,
-    mapByHour,
-    mapByAll
+    getMap
 };

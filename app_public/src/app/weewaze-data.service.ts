@@ -30,7 +30,7 @@ export class WeewazeDataService{
   }
 
   public callHTTP(day: string, hourmin: string, hourmax: string): Promise<Point[]> {
-    const url: string = `${this.apiBaseUrl}/partmap?day=${parseInt(day)}&hourmin=${hourmin}&hourmax=${hourmax}`;
+    const url: string = `${this.apiBaseUrl}/v1/resources/maps?display=true&day=${parseInt(day)}&hourmin=${hourmin}&hourmax=${hourmax}`;
     return this.http.get<Point[]>(url)
       .toPromise()
       .then(

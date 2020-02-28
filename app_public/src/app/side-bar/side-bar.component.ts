@@ -26,8 +26,7 @@ export class SideBarComponent{
   @Output() querySubmit = new EventEmitter<string>();
 
   
-  constructor(public weewazeDataService: WeewazeDataService) { 
-  }
+  constructor(public weewazeDataService: WeewazeDataService) { }
 
   public onSubmit(): void {
     this.formError = '';
