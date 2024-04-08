@@ -1,10 +1,10 @@
-# WeeWaze: Traffic Visualization at Scale
+# WeeWaze: Traffic Visualization from SFMTA
 
 ## Introduction
 
-The economic cost of traffic congestion exceeds $500 billion a year and is projected to get worse over time as more people move into cities. Having access to fine-grained historical traffic patterns is useful for data analysts who wants to visualize the data and data scientists running traffic prediction algorithms. 
+The economic cost of traffic congestion exceeds $500 billion a year; having access to fine-grained historical traffic patterns is useful for running prediction algorithms. 
 
-WeeWaze is a project I built while I was a data engineering fellow at Insight Data Science. The purpose of WeeWaze is to translate approximately 100GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco given an arbitary time range.  I built a scalable pipeline that supports ad hoc queries, a single page application that interacts with the user, and a REST API that interfaces with the entire dataset post transformation.  Take a look at the API inside [root/app_public](https://github.com/yezixbei/WeeWaze/tree/master/app_api).  See a demo of the live website on heroku:  [http://bit.ly/WeeWaze](http://bit.ly/WeeWaze).
+I worked on WeeWaze as a data engineering fellow at Insight Data Science. The purpose is to translate approximately 87GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco given an arbitary time range.  I built a data pipeline that supports ad hoc queries, an SPA (single page application) that interacts with the user, and a REST API that interfaces with the entire dataset post transformation.  Take a look at the API inside [root/app_public](https://github.com/yezixbei/WeeWaze/tree/master/app_api).  See a demo of the live website on heroku:  [http://bit.ly/WeeWaze](http://bit.ly/WeeWaze).
 
 ![weewaze_front_page](app_public/src/assets/pics/weewaze_front_page.png)
 
@@ -12,26 +12,23 @@ WeeWaze is a project I built while I was a data engineering fellow at Insight Da
 
 ## Dataset
 
-The batch data consists of 87GB of GPS logs spread over approximately 1200 CSV files.  It covers the routes of 330 buses in San Francisco over the span of four years from 2013 to 2016. It has the following schema: [REV, REPORT_TIME, VEHICLE_TAG, LONGITUDE, LATITUDE, SPEED, HEADING, TRAIN_ASSIGNMENT, PREDICTABLE], but the columns we are interested in are [REPORT_TIME, LONGITUDE, LATITUDE, SPEED, HEADING]. The size of the original dataset is about a billion rows.  See the dataset at [data.sfgov.org](https://data.sfgov.org/Transportation/Historical-raw-AVL-GPS-data/5fk7-ivit).
+The original dataset is 87GB of GPS logs spread over approximately 1200 CSV files.  It covers the routes of 330 buses in San Francisco over the span of four years from 2013 to 2016. It has the following schema: [REV, REPORT_TIME, VEHICLE_TAG, LONGITUDE, LATITUDE, SPEED, HEADING, TRAIN_ASSIGNMENT, PREDICTABLE], but the columns we are interested in are [REPORT_TIME, LONGITUDE, LATITUDE, SPEED, HEADING]. The size of the original dataset is about a billion rows.  See the dataset at [data.sfgov.org](https://data.sfgov.org/Transportation/Historical-raw-AVL-GPS-data/5fk7-ivit).
 
 
 
 ## Tools & Design Decisions
 
-I used S3 for batch storage, Spark for batch processing, and PostgreSQL for "hot spot" storage. I used S3 because I needed something that can do massive reads and writes, and I chose it over HDFS because it was cheaper and can expand without hardware limits. I choose Spark over Hadoop for batch processing because I could work with higher level abstrations like dataframes rather than write every single command in map-reduce. If time to deployment was not an issue, and I had time to become a Hadoop expert, I would consider using Hadoop becauese it is computationally cheaper. I chose PostgreSQL for "hot spot" storage because it offered simple data models, multi-key access (as opposed to single-key access for a document database), and built-in aggregations.  If I had used a document database I would have had to duplicate my tables for each unit of time in order to get a time querable view.  The downside is Postgres is not write scalable; if I ever want to update this project to include real-time views and scale up the number of users, I would have to switch to a NoSQL database.
-
-I built the REST API with Express, Sequelize, and Node.js and the single page application with D3 and Angular. Angular was chosen for the front end for its reusable components because of the short time constraints of the project, and D3 provides interactive data visualizations. 
+I used S3 for batch storage, Spark for batch processing, and PostgreSQL for adhoc storage. I built the REST API with Express, Sequelize, and Node.js and the single page application with D3 and Angular. Angular was chosen for the front end for its reusable components because of the short time constraints of the project, and D3 provides interactive data visualizations. 
 
 ![tools_design](app_public/src/assets/pics/tools_design.png)
 
 
 
-## Pipe Diagrams
+## Pipeline
 
-The end product shoud be a map over San Francisco for an arbitary time range. In the first pipe diagram (the first column in the diagram below), for each row in the form of [timestamp, gps, speed], I translated the timestamp into a time slot, divided San Francisco into squares of n meters, and translated gps coordinates into the location of its square. Next,  I did a groupby over these two parameters to get the sums and counts of speed. This transformation is performed in Spark and will shrink the original dataset from 1 billion to about 2 milion rows, resulting in the following schema [time slot, square location, speed sum, speed count]. The results are then stored in Postgres. 
+The end product shoud be a map over San Francisco for an arbitary time range. In the first pipeline (the first column in the diagram below), for each row in the form of [timestamp, gps, speed], I translated the timestamp into a time slot, divided San Francisco into squares of n meters, and translated gps coordinates into the location of its square. Next,  I did a groupby over these two parameters to get the sums and counts of speed. This transformation is performed in Spark and will shrink the original dataset from 1 billion to about 2 milion rows, resulting in the following schema [time slot, square location, speed sum, speed count]. The results are then stored in Postgres. 
 
-In the second pipe diagram (the second column), for each square, I find the average speed using the speed sum and counts.  The input is small enough that the second pipe can be done in Postgres at run time.  I can either query my API to dynamically generate a plot of the average speeds for a time range or use the UI. The UI queries my API at run time. The inputs are a day of the week, and a time range during a day in hours. 
-
+In the second pipeline (the second column), for each square, I found the average speed using the speed sum and counts.  The input is small enough that the second computation can be done in Postgres at run time.  I can either query my API to dynamically generate a plot of the average speeds for a time range or use the UI. The UI queries my API at run time. The inputs are a day of the week, and a time range during a day in hours. 
 
 
 ![pipe_diagrams](app_public/src/assets/pics/pipe_diagrams.png)
@@ -40,9 +37,9 @@ In the second pipe diagram (the second column), for each square, I find the aver
 
 ## Engineering Challenge
 
-One challenge for this project is making the pipeline scalable. Aside from picking the right tools, one main strategy is to use heuristics to keep transformations simple for the tools I picked.  In my case my  bottleneck was translating complex transformations into simple ones so that it can be scaled in Spark. 
+One challenge for this project is making the pipeline scalable. Aside from picking the right tools, one main strategy is to use heuristics to keep transformations simple for the tools I picked.  In my case my bottleneck was translating complex transformations into simple ones so that it can be scaled in Spark. 
 
-For example, reverse coding coordinates in each row is a challenge. There are paid services like Google Roads that can be queried to do this at a much smaller scale, but I need to do this on a massive dataset. What I ended up doing is divide San Franciso into squares of size n (e.g. 100 meters) using the rule that the bounding box of a set of coordinates to the mth decimal place is n meters long. This means if I round the longitude and latitude of each row to the mth decimal place, every point within the same bounding square can be accounted for by using a group by.  Next I projected the edges of each square using something called equirectangular projection, which is a simple multiplication, to generate a visualization of the map in 2D. 
+For example, how to do reverse coding coordinates per row for a large dataset? There are paid services like Google Roads that can be queried for a smaller dataset. What I ended up doing is dividing San Franciso into squares of size n (e.g. 100 meters) using the rule that the bounding box of a set of coordinates to the mth decimal place is n meters long. This means if I round the longitude and latitude of each row to the mth decimal place, every point within the same bounding square can be accounted for by using a group by.  Next I projected the edges of each square using something called equirectangular projection, which is a simple multiplication, to generate a visualization of the map in 2D. 
 
 
 
