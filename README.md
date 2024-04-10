@@ -1,10 +1,10 @@
-# WeeWaze: Traffic Visualization from SFMTA
+# WeeWaze: Traffic Visualizations from the SFMTA
 
 ## Introduction
 
 The economic cost of traffic congestion exceeds $500 billion a year; having access to fine-grained historical traffic patterns is useful for running prediction algorithms. 
 
-I worked on WeeWaze as a data engineering fellow at Insight Data Science. The purpose is to translate approximately 87GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco given an arbitary time range.  I built a data pipeline that supports ad hoc queries, an SPA (single page application) that interacts with the user, and a REST API that interfaces with the entire dataset post transformation.  Take a look at the API inside [root/app_public](https://github.com/yezixbei/WeeWaze/tree/master/app_api).
+WeeWaze was a project for Insight Data Science, to translate approximately 87GB of GPS logs from SFMTA into a format that can be used to dynamically generate historical traffic patterns in San Francisco, given an arbitary time range.  It includes a data pipeline that supports ad hoc queries, an SPA (single page application) that interacts with the user, and a REST API that interfaces with the entire dataset post transformation.  Take a look at the API inside [root/app_public](https://github.com/yezixbei/WeeWaze/tree/master/app_api).
 
 ![weewaze_front_page](app_public/src/assets/pics/weewaze_front_page.png)
 
@@ -26,7 +26,7 @@ I used S3 for batch storage, Spark for batch processing, and PostgreSQL for adho
 
 ## Pipelines
 
-The end product shoud be a map over San Francisco for an arbitary time range. In the first pipeline (the first column in the diagram below), for each row in the form of [timestamp, gps, speed], I translated the timestamp into a time slot, divided San Francisco into squares of n meters, and translated gps coordinates into the location of its square. Next,  I did a groupby over these two parameters to get the sums and counts of speed. This transformation is performed in Spark and will shrink the original dataset from 1 billion to about 2 milion rows, resulting in the following schema [time slot, square location, speed sum, speed count]. The results are then stored in Postgres. 
+The end product should be a map over San Francisco for an arbitary time range. In the first pipeline (the first column in the diagram below), for each row in the form of [timestamp, gps, speed], I translated the timestamp into a time slot, divided San Francisco into squares of n meters, and translated gps coordinates into the location of its square. Next,  I did a groupby over these two parameters to get the sums and counts of speed. This transformation is performed in Spark and will shrink the original dataset from 1 billion to about 2 milion rows, resulting in the following schema [time slot, square location, speed sum, speed count]. The results are then stored in Postgres. 
 
 In the second pipeline (the second column), for each square, I found the average speed using the speed sum and counts.  The input is small enough that the second computation can be done in Postgres at run time.  I can either query my API to dynamically generate a plot of the average speeds for a time range or use the UI. The UI queries my API at run time. The inputs are a day of the week, and a time range during a day in hours. 
 
